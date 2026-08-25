@@ -24,7 +24,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3002:3000"
     environment:
       DATABASE_URL: "postgresql://crm_user:crm_pass@db:5432/crm_perfumeria"
       JWT_SECRET: "${JWT_SECRET:-cambia_este_secreto_jwt}"
