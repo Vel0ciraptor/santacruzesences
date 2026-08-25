@@ -1,0 +1,122 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Usuario {
+  id           String    @id @default(uuid())
+  nombre       String
+  email        String    @unique
+  passwordHash String
+  rol          String    @default("VENDEDOR") // ADMIN | VENDEDOR
+  activo       Boolean   @default(true)
+  creadoPorId  String?
+  creadoPor    Usuario?  @relation("CreadoPor", fields: [creadoPorId], references: [id])
+  subordinados Usuario[] @relation("CreadoPor")
+  creadoEn     DateTime  @default(now())
+
+  ventas      Venta[]
+  clientes    Cliente[]
+  movimientos MovimientoStock[]
+  pedidos     Pedido[]          @relation("VendedorAsignado")
+}
+
+model Producto {
+  id          String   @id @default(uuid())
+  sku         String   @unique
+  nombre      String
+  marca       String?
+  descripcion String?
+  precio      Float
+  imagenUrl   String
+  activo      Boolean  @default(true)
+  creadoEn    DateTime @default(now())
+
+  stock         Stock?
+  movimientos   MovimientoStock[]
+  ventaDetalles VentaDetalle[]
+}
+
+model Stock {
+  id            String   @id @default(uuid())
+  productoId    String   @unique
+  producto      Producto @relation(fields: [productoId], references: [id])
+  cantidad      Int      @default(0)
+  stockMinimo   Int      @default(5)
+  actualizadoEn DateTime @updatedAt
+}
+
+model MovimientoStock {
+  id         String   @id @default(uuid())
+  productoId String
+  producto   Producto @relation(fields: [productoId], references: [id])
+  tipo       String   // ENTRADA | SALIDA | AJUSTE
+  cantidad   Int
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  motivo     String?
+  fecha      DateTime @default(now())
+}
+
+model Cliente {
+  id          String   @id @default(uuid())
+  nombre      String
+  telefono    String?
+  email       String?
+  notas       String?
+  creadoPorId String
+  creadoPor   Usuario  @relation(fields: [creadoPorId], references: [id])
+  creadoEn    DateTime @default(now())
+
+  ventas  Venta[]
+  pedidos Pedido[]
+}
+
+model Venta {
+  id         String   @id @default(uuid())
+  vendedorId String
+  vendedor   Usuario  @relation(fields: [vendedorId], references: [id])
+  clienteId  String?
+  cliente    Cliente? @relation(fields: [clienteId], references: [id])
+  total      Float
+  estado     String   @default("CONFIRMADA") // PENDIENTE | CONFIRMADA | CANCELADA
+  fecha      DateTime @default(now())
+
+  detalles VentaDetalle[]
+}
+
+model VentaDetalle {
+  id             String   @id @default(uuid())
+  ventaId        String
+  venta          Venta    @relation(fields: [ventaId], references: [id])
+  productoId     String
+  producto       Producto @relation(fields: [productoId], references: [id])
+  cantidad       Int
+  precioUnitario Float
+}
+
+model Pedido {
+  id                 String   @id @default(uuid())
+  clienteId          String?
+  cliente            Cliente? @relation(fields: [clienteId], references: [id])
+  nombreClienteTexto String?
+  telefonoTexto      String?
+  itemsJson          String   // JSON string snapshot
+  total              Float
+  estado             String   @default("PENDIENTE") // PENDIENTE | CONFIRMADO | RECHAZADO
+  vendedorAsignadoId String?
+  vendedorAsignado   Usuario? @relation("VendedorAsignado", fields: [vendedorAsignadoId], references: [id])
+  fecha              DateTime @default(now())
+}
+
+model Premio {
+  id     String  @id @default(uuid())
+  texto  String
+  color  String  @default("#10b981")
+  peso   Int     @default(1)
+  activo Boolean @default(true)
+}
