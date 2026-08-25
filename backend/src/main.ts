@@ -1,6 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import { existsSync } from 'fs';
 import { PrismaService } from './prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 
@@ -33,7 +36,7 @@ async function ensureAdmin(prisma: PrismaService) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const prisma = app.get(PrismaService);
   await ensureAdmin(prisma);
@@ -53,6 +56,18 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
+
+  const publicPath = join(__dirname, '..', 'public');
+  if (existsSync(publicPath)) {
+    app.useStaticAssets(publicPath);
+    const httpAdapter = app.getHttpAdapter();
+    app.use((req: any, res: any, next: any) => {
+      if (req.path.startsWith('/api/')) return next();
+      const filePath = join(publicPath, req.path);
+      if (existsSync(filePath)) return next();
+      res.sendFile(join(publicPath, 'index.html'));
+    });
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
