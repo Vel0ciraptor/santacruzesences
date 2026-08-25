@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Instalar OpenSSL y herramientas necesarias para compilar Prisma en Alpine
+RUN apk add --no-cache openssl libc6-compat
+
 COPY package*.json ./
 RUN npm ci
 
@@ -14,6 +17,9 @@ RUN npm run build
 FROM node:20-alpine AS production
 
 WORKDIR /app
+
+# Instalar OpenSSL en el contenedor de producción para el runtime de Prisma
+RUN apk add --no-cache openssl libc6-compat
 
 COPY package*.json ./
 RUN npm ci --omit=dev
