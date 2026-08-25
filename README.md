@@ -71,11 +71,17 @@ El sistema incluye dos herramientas potentes para subir y bajar información de 
 
 ---
 
-## 🔑 Credenciales por Defecto (Seeder Inicial)
+## 🔑 Credenciales del Admin (Seeder Inicial)
 
-- **Email:** `admin@santacruzessence.com`
-- **Contraseña:** `Admin123!`
-- **Rol:** `ADMIN`
+Las credenciales del administrador se configuran mediante variables de entorno:
+
+```bash
+SEED_ADMIN_EMAIL=tu@email.com
+SEED_ADMIN_PASSWORD=tu_contraseña_segura
+SEED_ADMIN_NOMBRE=Administrador
+```
+
+> **Importante:** Estas variables **deben** estar definidas en el `.env` o en el `docker-compose.yml` antes de ejecutar el seed. Si no están configuradas, el sistema no creará el usuario admin automáticamente.
 
 ---
 

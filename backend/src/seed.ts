@@ -11,25 +11,29 @@ async function main() {
   console.log('🌱 Iniciando seeder...');
 
   // Admin inicial
-  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@santacruzessence.com';
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || 'Admin123!';
+  const adminEmail = process.env.SEED_ADMIN_EMAIL;
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
   const adminNombre = process.env.SEED_ADMIN_NOMBRE || 'Administrador';
 
-  const adminExiste = await prisma.usuario.findUnique({ where: { email: adminEmail } });
-
-  if (!adminExiste) {
-    const hash = await bcrypt.hash(adminPassword, 10);
-    await prisma.usuario.create({
-      data: {
-        nombre: adminNombre,
-        email: adminEmail,
-        passwordHash: hash,
-        rol: 'ADMIN',
-      },
-    });
-    console.log(`✅ Admin creado: ${adminEmail} / ${adminPassword}`);
+  if (!adminEmail || !adminPassword) {
+    console.log('⚠️  SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD deben estar definidos. Saltando creación de admin.');
   } else {
-    console.log(`ℹ️  Admin ya existe: ${adminEmail}`);
+    const adminExiste = await prisma.usuario.findUnique({ where: { email: adminEmail } });
+
+    if (!adminExiste) {
+      const hash = await bcrypt.hash(adminPassword, 10);
+      await prisma.usuario.create({
+        data: {
+          nombre: adminNombre,
+          email: adminEmail,
+          passwordHash: hash,
+          rol: 'ADMIN',
+        },
+      });
+      console.log(`✅ Admin creado: ${adminEmail}`);
+    } else {
+      console.log(`ℹ️  Admin ya existe: ${adminEmail}`);
+    }
   }
 
   // Premios de ruleta demo

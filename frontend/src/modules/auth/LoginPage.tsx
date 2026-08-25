@@ -59,7 +59,11 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const fillDemo = (email: string, pass: string) => {
+  const fillDemo = () => {
+    const email = prompt('Ingresa el email del usuario demo:');
+    if (!email) return;
+    const pass = prompt('Ingresa la contraseña:');
+    if (!pass) return;
     setValue('email', email);
     setValue('password', pass);
   };
@@ -156,10 +160,10 @@ export const LoginPage: React.FC = () => {
           </p>
           <div className="grid grid-cols-1 gap-2">
             <button
-              onClick={() => fillDemo('admin@santacruzessence.com', 'Admin123!')}
+              onClick={fillDemo}
               className="px-3 py-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-teal-500/40 text-xs text-slate-300 hover:text-teal-300 transition-colors text-left flex justify-between items-center"
             >
-              <span>🔑 Admin Inicial: <strong className="text-teal-400">admin@santacruzessence.com</strong></span>
+              <span>🔐 Ingresar con credenciales de demostración</span>
               <span className="text-[10px] bg-teal-950 text-teal-300 px-2 py-0.5 rounded border border-teal-800">Auto-Llenar</span>
             </button>
           </div>
