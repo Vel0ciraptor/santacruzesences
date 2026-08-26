@@ -26,7 +26,7 @@ export const ImportarExcelPage: React.FC = () => {
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) { alert('No hay sesión activa'); return; }
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api/v1';
       const res = await fetch(`${API_URL}/reportes/plantilla/productos`, {
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -21,7 +21,7 @@ export const ReportesAdminPage: React.FC = () => {
   const [restoreError, setRestoreError] = useState<string | null>(null);
 
   const downloadExcel = (endpoint: string, filename: string) => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api/v1';
     const token = localStorage.getItem('accessToken');
 
     fetch(`${API_URL}/reportes/export/${endpoint}`, {
