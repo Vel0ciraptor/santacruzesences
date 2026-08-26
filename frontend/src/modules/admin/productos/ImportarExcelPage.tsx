@@ -25,10 +25,15 @@ export const ImportarExcelPage: React.FC = () => {
   const handleDownloadPlantilla = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      if (!token) { alert('No hay sesión activa'); return; }
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
       const res = await fetch(`${API_URL}/reportes/plantilla/productos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Error al descargar plantilla Excel' }));
+        throw new Error(err.message || `Error ${res.status}`);
+      }
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -37,8 +42,9 @@ export const ImportarExcelPage: React.FC = () => {
       document.body.appendChild(a);
       a.click();
       a.remove();
-    } catch {
-      alert('Error al descargar plantilla Excel.');
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message || 'Error al descargar plantilla Excel.');
     }
   };
 

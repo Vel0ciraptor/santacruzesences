@@ -40,10 +40,15 @@ export const ProductosAdminPage: React.FC = () => {
   const handleDescargarCatalogo = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      if (!token) { alert('No hay sesión activa'); return; }
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
       const res = await fetch(`${API_URL}/reportes/export/productos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Error al descargar el catálogo' }));
+        throw new Error(err.message || `Error ${res.status}`);
+      }
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -52,18 +57,24 @@ export const ProductosAdminPage: React.FC = () => {
       document.body.appendChild(a);
       a.click();
       a.remove();
-    } catch (err) {
-      alert('Error al descargar el catálogo');
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message || 'Error al descargar el catálogo');
     }
   };
 
   const handleDescargarPlantilla = async () => {
     try {
       const token = localStorage.getItem('accessToken');
+      if (!token) { alert('No hay sesión activa'); return; }
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
       const res = await fetch(`${API_URL}/reportes/plantilla/productos`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Error al descargar la plantilla' }));
+        throw new Error(err.message || `Error ${res.status}`);
+      }
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -72,8 +83,9 @@ export const ProductosAdminPage: React.FC = () => {
       document.body.appendChild(a);
       a.click();
       a.remove();
-    } catch (err) {
-      alert('Error al descargar la plantilla');
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message || 'Error al descargar la plantilla');
     }
   };
 
